@@ -1,13 +1,15 @@
 package com.ah;
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.stereotype.Repository;
+
 import java.sql.*;
 
-public class DataBase {
+@Repository
+public class Database {
 
     //URL for h2 bd
     static String dbUrl = "jdbc:h2:~/test";
-
-    Hasher hasher = new Hasher();
 
     //Connection to the h2 bd
     Connection conn;
@@ -18,7 +20,8 @@ public class DataBase {
     //Save the URL and hash
     String sqlSelect = "SELECT url FROM urls where hash=?";
 
-    public DataBase() throws SQLException {
+    @PostConstruct
+    public void init() {
         try {
             conn = DriverManager.getConnection(dbUrl);
             //Create table
@@ -35,7 +38,7 @@ public class DataBase {
     //Save the URL and hash
     public String saveUrl(String url) throws Exception {
         PreparedStatement stmt = conn.prepareStatement(sqlInsert);
-        String hash = hasher.getHash(url);
+        String hash = Hasher.getHash(url);
         stmt.setString(1, url);
         stmt.setString(2, hash);
         stmt.executeUpdate();
